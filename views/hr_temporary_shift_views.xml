@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hr_temporary_shift_tree" model="ir.ui.view">
+            <field name="name">hr.temporary.shift.tree</field>
+            <field name="model">hr.temporary.shift</field>
+            <field name="arch" type="xml">
+                <tree string="Temporary Shifts">
+                    <field name="employee_id"/>
+                    <field name="date"/>
+                    <field name="expected_start"/>
+                    <field name="expected_end"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_hr_temporary_shift" model="ir.actions.act_window">
+            <field name="name">Temporary Shifts</field>
+            <field name="res_model">hr.temporary.shift</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_hr_temporary_shift"
+                  name="Temporary Shifts"
+                  parent="hr_attendance.menu_hr_attendance_root"
+                  action="action_hr_temporary_shift"
+                  sequence="100"/>
+    </data>
+</odoo>

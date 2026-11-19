@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ======================= Periods ======================= -->
+        <record id="view_hr_payroll_attendance_period_tree" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.period.tree</field>
+            <field name="model">hr.payroll.attendance.period</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state == 'draft'"
+                      decoration-warning="state == 'pending_approval'"
+                      decoration-success="state in ('approved', 'closed')"
+                      decoration-muted="state == 'cancelled'"
+                      decoration-danger="error_count > 0 or exception_count > 0">
+                    <field name="period_key"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="state" widget="badge"
+                           decoration-info="state == 'draft'"
+                           decoration-warning="state == 'pending_approval'"
+                           decoration-success="state in ('approved', 'closed')"
+                           decoration-danger="state == 'cancelled'"/>
+                    <field name="summary_count"/>
+                    <field name="uncomputed_count"/>
+                    <field name="dirty_count"/>
+                    <field name="error_count"/>
+                    <field name="exception_count"/>
+                    <field name="approved_by_id"/>
+                    <field name="approved_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_payroll_attendance_period_form" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.period.form</field>
+            <field name="model">hr.payroll.attendance.period</field>
+            <field name="arch" type="xml">
+                <form string="فترة ملخص الحضور">
+                    <header>
+                        <button name="action_open_calculation" string="بدء التنفيذ" type="object"
+                                class="oe_highlight" states="draft"/>
+                        <button name="action_generate_missing" string="توليد السجلات الناقصة" type="object"
+                                states="draft,in_progress"/>
+                        <button name="action_recalculate_dirty" string="حساب المتغيّرة" type="object"
+                                states="draft,in_progress" icon="fa-refresh"/>
+                        <button name="action_recalculate_all" string="إعادة حساب الكل" type="object"
+                                states="draft,in_progress" icon="fa-repeat"
+                                confirm="سيتم تعليم جميع سجلات الفترة لإعادة الحساب. متابعة؟"/>
+                        <button name="action_request_approval" string="طلب اعتماد" type="object"
+                                class="oe_highlight" states="in_progress"/>
+                        <button name="action_approve" string="اعتماد" type="object"
+                                class="oe_highlight" states="pending_approval"
+                                groups="hr.group_hr_manager"/>
+                        <button name="action_close" string="إغلاق الفترة" type="object"
+                                states="approved" groups="hr.group_hr_manager"/>
+                        <button name="action_reopen" string="إعادة فتح" type="object"
+                                states="approved,closed,cancelled" groups="hr.group_hr_manager"/>
+                        <button name="action_cancel" string="إلغاء الفترة" type="object"
+                                states="draft,in_progress,pending_approval"
+                                confirm="إلغاء الفترة لا يحذف السجلات. متابعة؟"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,in_progress,pending_approval,approved,closed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_summaries" type="object" class="oe_stat_button"
+                                    icon="fa-table">
+                                <span class="o_stat_text">الملخصات</span>
+                            </button>
+                        </div>
+                        <div class="alert alert-warning" role="alert"
+                             attrs="{'invisible': ['&amp;', '&amp;', ('error_count', '=', 0), ('exception_count', '=', 0), ('dirty_count', '=', 0)]}">
+                            <p attrs="{'invisible': [('dirty_count', '=', 0)]}">
+                                <b>تنبيه:</b> <field name="dirty_count"/> سجل بحاجة لإعادة حساب — لا يمكن طلب الاعتماد قبل معالجتها.
+                            </p>
+                            <p attrs="{'invisible': [('error_count', '=', 0)]}">
+                                <b>أخطاء حساب:</b> <field name="error_count"/> سجل.
+                            </p>
+                            <p attrs="{'invisible': [('exception_count', '=', 0)]}">
+                                <b>استثناءات تصنيف أنواع إجازات:</b> <field name="exception_count"/> سجل — يمنع الاعتماد النهائي.
+                            </p>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="period_key" readonly="1"/>
+                                <field name="date_from" attrs="{'readonly': [('state', 'not in', ['draft', 'in_progress'])]}"/>
+                                <field name="date_to" attrs="{'readonly': [('state', 'not in', ['draft', 'in_progress'])]}"/>
+                            </group>
+                            <group>
+                                <field name="approved_by_id"/>
+                                <field name="approved_date"/>
+                                <field name="closed_by_id"/>
+                                <field name="closed_date"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="summary_count"/>
+                                <field name="uncomputed_count"/>
+                            </group>
+                            <group>
+                                <field name="dirty_count"/>
+                                <field name="error_count"/>
+                                <field name="exception_count"/>
+                            </group>
+                        </group>
+                        <group string="سبب آخر إعادة فتح">
+                            <field name="reopen_reason" nolabel="1" colspan="2"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_hr_payroll_attendance_period_search" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.period.search</field>
+            <field name="model">hr.payroll.attendance.period</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="period_key"/>
+                    <field name="company_id"/>
+                    <filter string="مفتوحة" name="filter_open"
+                            domain="[('state', 'in', ['draft', 'in_progress'])]"/>
+                    <filter string="بانتظار الاعتماد" name="filter_pending"
+                            domain="[('state', '=', 'pending_approval')]"/>
+                    <group expand="0" string="تجميع حسب">
+                        <filter string="الحالة" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="الشركة" name="group_company" context="{'group_by': 'company_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hr_payroll_attendance_period" model="ir.actions.act_window">
+            <field name="name">فترات ملخص الحضور</field>
+            <field name="res_model">hr.payroll.attendance.period</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_hr_payroll_attendance_period_search"/>
+            <field name="context">{'search_default_filter_open': 1}</field>
+        </record>
+
+        <!-- ======================= Calc Runs ======================= -->
+        <record id="view_hr_payroll_attendance_calc_run_tree" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.calc.run.tree</field>
+            <field name="model">hr.payroll.attendance.calc.run</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="state in ('done', 'done_with_errors')"
+                      decoration-info="state in ('draft', 'running')"
+                      decoration-danger="state in ('failed', 'cancelled')">
+                    <field name="id" string="#"/>
+                    <field name="period_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="trigger"/>
+                    <field name="state" widget="badge"/>
+                    <field name="processed_count"/>
+                    <field name="success_count"/>
+                    <field name="failed_count"/>
+                    <field name="total_count"/>
+                    <field name="started_at"/>
+                    <field name="finished_at"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_hr_payroll_attendance_calc_run_form" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.calc.run.form</field>
+            <field name="model">hr.payroll.attendance.calc.run</field>
+            <field name="arch" type="xml">
+                <form string="تشغيل الحساب">
+                    <header>
+                        <button name="action_process" string="متابعة التنفيذ" type="object"
+                                class="oe_highlight" states="draft,running"/>
+                        <button name="action_rerun_remaining" string="إعادة تشغيل المتبقي" type="object"
+                                states="running,done,done_with_errors,failed"/>
+                        <button name="action_retry_failed" string="إعادة محاولة الفاشلة" type="object"
+                                icon="fa-rotate-left"
+                                attrs="{'invisible': [('failed_count', '=', 0)]}"/>
+                        <button name="action_cancel_run" string="إلغاء" type="object"
+                                states="draft,running"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,running,done,done_with_errors,failed"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="period_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="trigger"/>
+                                <field name="processed_by_id"/>
+                            </group>
+                            <group>
+                                <field name="batch_size" readonly="1"/>
+                                <field name="max_batches" readonly="1"/>
+                                <field name="max_seconds" readonly="1"/>
+                                <field name="heartbeat"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="total_count"/>
+                                <field name="processed_count"/>
+                            </group>
+                            <group>
+                                <field name="success_count"/>
+                                <field name="failed_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="أخطاء" name="errors">
+                                <field name="error_line_ids" readonly="1">
+                                    <tree>
+                                        <field name="employee_id"/>
+                                        <field name="error_text"/>
+                                        <field name="message_date"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="ملاحظات" name="notes">
+                                <field name="notes"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_payroll_attendance_calc_run" model="ir.actions.act_window">
+            <field name="name">تشغيلات حساب الملخصات</field>
+            <field name="res_model">hr.payroll.attendance.calc.run</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- ======================= Menus ======================= -->
+        <menuitem id="menu_hr_payroll_attendance_period"
+                  name="فترات الحساب"
+                  parent="hr_attendance.menu_hr_attendance_root"
+                  action="action_hr_payroll_attendance_period"
+                  sequence="25"/>
+        <menuitem id="menu_hr_payroll_attendance_calc_run"
+                  name="تشغيلات الحساب"
+                  parent="hr_attendance.menu_hr_attendance_root"
+                  action="action_hr_payroll_attendance_calc_run"
+                  sequence="26"/>
+    </data>
+</odoo>

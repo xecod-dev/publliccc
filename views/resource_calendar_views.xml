@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+            Add fixed working hours section to the resource.calendar form.
+            This allows configuring a fixed daily hours quota for the calendar.
+        -->
+        <record id="view_resource_calendar_fixed_hours_form" model="ir.ui.view">
+            <field name="name">resource.calendar.fixed.work.hours</field>
+            <field name="model">resource.calendar</field>
+            <field name="inherit_id" ref="resource.resource_calendar_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="inside">
+                    <group string="Fixed Working Hours">
+                        <field name="use_fixed_work_hours"/>
+                        <field name="fixed_work_hours"
+                               attrs="{'invisible': [('use_fixed_work_hours','=',False)]}"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

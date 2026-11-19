@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hr_leave_type_form_inherit_excuse" model="ir.ui.view">
+            <field name="name">hr.leave.type.form.inherit.excuse</field>
+            <field name="model">hr.leave.type</field>
+            <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='color']" position="after">
+                    <field name="is_late_excuse"/>
+                    <field name="is_early_leave_excuse"/>
+                    <field name="is_mission"/>
+                    <field name="is_permission"/>
+                    <field name="classification_reviewed"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_hr_payroll_attendance_summary_wizard_form" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.summary.wizard.form</field>
+            <field name="model">hr.payroll.attendance.summary.wizard</field>
+            <field name="arch" type="xml">
+                <form string="تشغيل حساب ملخص الحضور">
+                    <group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="period_id"/>
+                        </group>
+                    </group>
+                    <group string="تصفية الموظفين (اختياري)">
+                        <field name="department_ids" widget="many2many_tags"/>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                    </group>
+                    <footer>
+                        <button name="action_generate" string="تشغيل الحساب" type="object" class="oe_highlight"/>
+                        <button string="إلغاء" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_hr_payroll_attendance_summary_wizard" model="ir.actions.act_window">
+            <field name="name">تشغيل حساب ملخص الحضور</field>
+            <field name="res_model">hr.payroll.attendance.summary.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <record id="view_hr_payroll_attendance_period_reopen_wizard_form" model="ir.ui.view">
+            <field name="name">hr.payroll.attendance.period.reopen.wizard.form</field>
+            <field name="model">hr.payroll.attendance.period.reopen.wizard</field>
+            <field name="arch" type="xml">
+                <form string="إعادة فتح الفترة">
+                    <group>
+                        <field name="period_ids" widget="many2many_tags" readonly="1"/>
+                        <field name="reopen_reason" placeholder="سبب إعادة فتح الفترة (إلزامي، يُسجل في التاريخ)"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm" string="إعادة فتح" type="object" class="oe_highlight"/>
+                        <button string="إلغاء" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

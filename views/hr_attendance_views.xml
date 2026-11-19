@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit tree view to show attendance status -->
+        <record id="view_hr_attendance_tree_inherit" model="ir.ui.view">
+            <field name="name">hr.attendance.tree.inherit</field>
+            <field name="model">hr.attendance</field>
+            <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='check_out']" position="after">
+                    <field name="attendance_status"/>
+                    <field name="calendar_id"/>
+                    <field name="week_number"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Inherit form view to show attendance status -->
+        <record id="view_hr_attendance_form_inherit" model="ir.ui.view">
+            <field name="name">hr.attendance.form.inherit</field>
+            <field name="model">hr.attendance</field>
+            <field name="inherit_id" ref="hr_attendance.hr_attendance_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='check_out']" position="after">
+                    <field name="attendance_status" readonly="1"/>
+                    <field name="calendar_id" readonly="1"/>
+                    <field name="week_number" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

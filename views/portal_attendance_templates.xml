@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_attendance_summary"
+              inherit_id="portal.portal_my_home"
+              priority="120">
+
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Attendance Summary</t>
+                <t t-set="url" t-value="'/my/attendance-summary'"/>
+                <t t-set="placeholder_count" t-value="'attendance_count'"/>
+            </t>
+
+        </xpath>
+    </template>
+
+    <template id="portal_attendance_summary" name="Attendance Summary Portal">
+
+        <t t-call="portal.portal_layout">
+
+            <t t-set="breadcrumbs">
+                <ol class="breadcrumb">
+                    <li><a href="/my">حسابي</a></li>
+                    <li class="active">ملخص الحضور</li>
+                </ol>
+            </t>
+
+            <div class="container p-4">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">ملخص الحضور</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <t t-if="records">
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover">
+
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>من</th>
+                                            <th>إلى</th>
+                                            <th>أيام الغياب</th>
+                                            <th>أيام الإجازات</th>
+                                            <th>التفاصيل</th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-foreach="records" t-as="rec">
+                                            <tr>
+
+                                                <td>
+                                                    <t t-esc="rec.date_from"/>
+                                                    <t t-if="rec.period_id and rec.period_id.state == 'pending_approval'">
+                                                        <span class="badge bg-warning text-dark">أولي</span>
+                                                    </t>
+                                                </td>
+
+                                                <td>
+                                                    <t t-esc="rec.date_to"/>
+                                                </td>
+
+                                                <td>
+                                                    <t t-esc="rec.total_absence_days"/>
+                                                </td>
+
+                                                <td>
+                                                    <t t-esc="rec.total_leave_days"/>
+                                                </td>
+
+                                                <td>
+                                                    <a t-attf-href="/my/attendance-summary/#{rec.id}" class="btn btn-sm btn-primary">
+                                                        عرض التفاصيل
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </t>
+
+                        <t t-if="not records">
+                            <div class="alert alert-info text-center">
+                                لا توجد بيانات حضور
+                            </div>
+                        </t>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </t>
+
+    </template>
+
+<template id="portal_attendance_detail" name="Attendance Summary Detail Portal">
+
+    <t t-call="portal.portal_layout">
+
+        <t t-set="breadcrumbs">
+            <ol class="breadcrumb">
+                <li><a href="/my">حسابي</a></li>
+                <li><a href="/my/attendance-summary">ملخص الحضور</a></li>
+                <li class="active">تفاصيل سجل</li>
+            </ol>
+        </t>
+
+        <div class="container my-4" style="direction: rtl; text-align: right;">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>تفاصيل الحضور
+                    <t t-if="preliminary">
+                        <span class="badge bg-warning text-dark" style="font-size: 0.7em; vertical-align: middle;">
+                            أولي (بانتظار الاعتماد)
+                        </span>
+                    </t>
+                </h3>
+                <a href="/my/attendance-summary" class="btn btn-secondary">
+                    رجوع
+                </a>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <h5 class="mb-3 fw-bold text-primary">البيانات الأساسية</h5>
+
+                    <div class="mb-2"><strong>الموظف:</strong> <t t-esc="rec.employee_id.name"/></div>
+                    <div class="mb-2"><strong>القسم:</strong> <t t-esc="rec.department_id.name"/></div>
+                    <div class="mb-2"><strong>مقر العمل:</strong> <t t-esc="rec.work_location.name"/></div>
+                    <div class="row text-right mb-2">
+
+                        <div class="col-6 mb-2">
+                            <strong>من:</strong>
+                            <t t-esc="rec.date_from"/>
+                        </div>
+
+                        <div class="col-6 mb-2">
+                            <strong>إلى:</strong>
+                            <t t-esc="rec.date_to"/>
+                        </div>
+
+                    </div>
+                    <hr/>
+
+                    <h5 class="mb-3 fw-bold text-primary">النتائج</h5>
+
+                    <div class="row text-right">
+
+                        <div class="col-6 mb-2">
+                            <strong>إجمالي أيام الغياب الفعلي:</strong>
+                            <t t-esc="rec.total_absence_days"/>
+                        </div>
+
+                        <div class="col-6 mb-2">
+                            <strong>إجمالي أيام الإجازة:</strong>
+                            <t t-esc="rec.total_leave_days"/>
+                        </div>
+
+                        <div class="col-6 mb-2">
+                            <strong>أيام الإجازة قيد الانتظار:</strong>
+                            <t t-esc="rec.total_penalty_days"/>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <strong>إجمالي أيام جزاءات التأخير:</strong>
+                            <t t-esc="rec.pending_leave_days"/>
+                        </div>
+
+                        <div class="col-6 mb-2">
+                            <strong>عدد مرات نسيان البصمة:</strong>
+                            <t t-esc="rec.forgot_attendance_count"/>
+                        </div>
+
+                    </div>
+
+                    <hr/>
+
+                    <h5 class="mb-3 fw-bold text-primary">التأخير والإضافي</h5>
+
+                    <div class="row text-right">
+
+                        <div class="col-6 mb-2">
+                            <strong>التأخير:</strong>
+                            <t t-esc="('%02d:%02d' % (int(rec.total_lateness_hours), int((rec.total_lateness_hours % 1) * 60)))"/>
+                        </div>
+
+                        <div class="col-6 mb-2">
+                            <strong>الإضافي:</strong>
+                            <t t-esc="('%02d:%02d' % (int(rec.total_extra_hours), int((rec.total_extra_hours % 1) * 60)))"/>
+                        </div>
+
+                    </div>
+
+                    <hr/>
+
+                    <h5 class="mb-3 fw-bold text-primary">تفاصيل الحساب</h5>
+
+                    <style>
+                        .extra-col {
+                            display: none;
+                        }
+                    </style>
+                    <div class="table-responsive" style="overflow-x:auto; ">
+                        <div class="o_portal_wrap" style="min-width:800px; display:inline-block;">
+                            <div t-raw="rec.calculation_log_html"/>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </t>
+</template>
+</odoo>

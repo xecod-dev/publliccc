@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="ir_cron_attendance_process_dirty" model="ir.cron">
+            <field name="name">Attendance Summary: Process Dirty Rows</field>
+            <field name="model_id" ref="hr_payroll_attendance.model_hr_payroll_attendance_engine"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_process_dirty()</field>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <record id="ir_cron_attendance_daily_reconcile" model="ir.cron">
+            <field name="name">Attendance Summary: Daily Reconcile</field>
+            <field name="model_id" ref="hr_payroll_attendance.model_hr_payroll_attendance_engine"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_daily_reconcile()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 04:30:00')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <record id="ir_cron_attendance_watchdog" model="ir.cron">
+            <field name="name">Attendance Summary: Run Watchdog</field>
+            <field name="model_id" ref="hr_payroll_attendance.model_hr_payroll_attendance_engine"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_watchdog()</field>
+            <field name="interval_number">10</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <record id="ir_cron_attendance_period_autogen" model="ir.cron">
+            <field name="name">Attendance Summary: Auto-generate Current Period</field>
+            <field name="model_id" ref="hr_payroll_attendance.model_hr_payroll_attendance_period"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_auto_generate()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 04:00:00')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+    </data>
+</odoo>
